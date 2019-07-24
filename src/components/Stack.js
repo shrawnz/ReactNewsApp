@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import Card from './Card';
 import Navbar from './Navbar';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.min.js';
 
 class Stack extends Component {
     constructor(props){
@@ -8,6 +10,7 @@ class Stack extends Component {
         this.state = {
             articles : [],
             updateCounter: 0,
+            apiError: false
         }
     }
     // componentDidUpdate(){
@@ -17,11 +20,16 @@ class Stack extends Component {
         fetch(url)
         .then(res => res.json())
         .then((data) => {
-            this.setState({
-                articles: data.articles,
-                updateCounter: this.state.updateCounter + 1
-            })
-            console.log(this.state.articles);
+            console.log(data);
+            if(data.status !== "error") {
+                this.setState({
+                    articles: data.articles,
+                    updateCounter: this.state.updateCounter + 1
+                })
+                console.log(this.state.articles);
+            } else {
+                this.setState({apiError:true, updateCounter: this.state.updateCounter + 1})
+            }
         })
         .catch(console.log)
     }
@@ -31,7 +39,12 @@ class Stack extends Component {
 
     componentDidMount() {
         this.homeCallback();
+        localStorage.setItem('bookmarks',JSON.stringify({}));
     }
+
+    componentWillUnmount () {
+        localStorage.set('bookmarks', JSON.stringify(this.state.articles));
+      }
 
     homeCallback = () => {
         let url = "https://newsapi.org/v2/top-headlines?country=in&apiKey=" + process.env.REACT_APP_API_KEY;
@@ -39,7 +52,7 @@ class Stack extends Component {
     }
 
     searchCallback = (q) => {
-        let url = "https://newsapi.org/v2/everything?country=in&q=" + q + "&apiKey=" + process.env.REACT_APP_API_KEY;
+        let url = "https://newsapi.org/v2/everything?q=" + q + "&apiKey=" + process.env.REACT_APP_API_KEY;
         this.hitNewsAPI(url)
     }
 
@@ -49,6 +62,21 @@ class Stack extends Component {
         this.hitNewsAPI(url)
     }
 
+    bookmarkCallback = (i) => {
+        var article = this.state.articles[i];
+        var bookmarks = JSON.parse(localStorage.getItem("bookmarks"));
+        bookmarks[article.url] = article;
+        localStorage.setItem('bookmarks',JSON.stringify(bookmarks));
+    }
+
+    getBookmarks = () => {
+        var bookmarks = JSON.parse(localStorage.getItem("bookmarks"));
+        console.log(bookmarks);
+        this.setState({
+            articles: Object.values(bookmarks),
+            updateCounter: this.state.updateCounter + 1,
+        })
+    }
     renderCard = (i) => {
         var article = this.state.articles[i];
         var content = (article.content !== null) ? article.content.substring(0, 260) : ""
@@ -58,20 +86,51 @@ class Stack extends Component {
             imageUrl = {article.urlToImage}
             content = {content}
             title = {article.title}
-            publishedAt = {new Date(article.publishedAt).toLocaleString()}>
+            publishedAt = {new Date(article.publishedAt).toLocaleString()}
+            bookmarkCallback = {this.bookmarkCallback}>
             </Card>
     }
-    
 
-    render() {
-        return <div><Navbar 
+    renderLoader = () => {
+        if(this.state.articles.length === 0 && !this.state.apiError){
+        return <div class="mt-4"><div class="text-center">
+                <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+                </div></div></div>
+        }
+        return <div></div>;
+    }
+
+    renderErrorPage = () => {
+        return <h4 class="mt-4 ml-4">API Request Failed! Please try again.</h4>
+    }
+
+    renderNewsStack = () => {
+        return <div>{this.state.articles.map((article, i) => {                
+            // Return the element. Also pass key     
+            return (this.renderCard(i)); 
+         })}</div>
+    }
+
+    renderStack = () => {
+        if(this.state.apiError)
+            return this.renderErrorPage();
+        return this.renderNewsStack();
+    }
+ 
+    renderNavbar = () => {
+        return <Navbar 
         categoryCallback = {this.categoryCallback}
         searchCallback = {this.searchCallback}
-        homeCallback = {this.homeCallback}></Navbar>
-        {this.state.articles.map((article, i) => {                
-           // Return the element. Also pass key     
-           return (this.renderCard(i)); 
-        })}
+        homeCallback = {this.homeCallback}
+        getBookmarks = {this.getBookmarks}></Navbar>
+    }
+
+    render() {
+        return <div>
+        {this.renderNavbar()}
+        {this.renderLoader()}
+        {this.renderStack()}
         </div>
     }
 }

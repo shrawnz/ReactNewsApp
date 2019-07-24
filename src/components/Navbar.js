@@ -26,7 +26,7 @@ class Navbar extends Component{
   
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item dropdown">
+        <li class="nav-item active dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Category
           </a>
@@ -46,6 +46,10 @@ class Navbar extends Component{
             <a class="dropdown-item" href="#" onClick={() => {
             this.props.categoryCallback("technology")}}>Technology</a>
           </div>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="#" onClick={() => {
+            this.props.getBookmarks()}}>Bookmarks</a>
         </li>
       </ul>
       <form class="form-inline my-2 my-lg-0">
