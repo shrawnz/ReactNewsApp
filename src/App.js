@@ -5,11 +5,7 @@ import Stack from './components/Stack'
 
 function App() {
   return (
-<div className="App">
-      <header className="App-header">
         <Stack></Stack>
-      </header>
-    </div>
   );
 }
 

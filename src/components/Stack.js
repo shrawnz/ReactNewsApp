@@ -25,33 +25,40 @@ class Stack extends Component {
         })
         .catch(console.log)
     }
+
     shouldComponentUpdate(nextProps, nextState) {
         return this.state.updateCounter !== nextState.updateCounter }
 
     componentDidMount() {
-        let url = 'https://newsapi.org/v2/top-headlines?country=in&apiKey=55ffbe3b23e244469c35f15e37f86378';
-        this.hitNewsAPI(url);
+        this.homeCallback();
+    }
+
+    homeCallback = () => {
+        let url = "https://newsapi.org/v2/top-headlines?country=in&apiKey=" + process.env.REACT_APP_API_KEY;
+        this.hitNewsAPI(url);       
     }
 
     searchCallback = (q) => {
-        let url = "https://newsapi.org/v2/top-headlines?country=in&q=" + q + "&apiKey=55ffbe3b23e244469c35f15e37f86378";
+        let url = "https://newsapi.org/v2/everything?country=in&q=" + q + "&apiKey=" + process.env.REACT_APP_API_KEY;
         this.hitNewsAPI(url)
     }
 
     categoryCallback = (category) => {
-        let url = "https://newsapi.org/v2/top-headlines?country=in&category=" + category + "&apiKey=55ffbe3b23e244469c35f15e37f86378";
+        let url = "https://newsapi.org/v2/top-headlines?country=in&category=" + category + "&apiKey=" + process.env.REACT_APP_API_KEY;
         console.log(url);
         this.hitNewsAPI(url)
     }
 
     renderCard = (i) => {
+        var article = this.state.articles[i];
+        var content = (article.content !== null) ? article.content.substring(0, 260) : ""
         return <Card 
             index = {i}
-            url = {this.state.articles[i].url}
-            imageUrl = {this.state.articles[i].urlToImage}
-            content = {this.state.articles[i].content}
-            title = {this.state.articles[i].title}
-            source = {this.state.articles[i].source.name}>
+            url = {article.url}
+            imageUrl = {article.urlToImage}
+            content = {content}
+            title = {article.title}
+            publishedAt = {new Date(article.publishedAt).toLocaleString()}>
             </Card>
     }
     
@@ -59,7 +66,8 @@ class Stack extends Component {
     render() {
         return <div><Navbar 
         categoryCallback = {this.categoryCallback}
-        searchCallback = {this.searchCallback}></Navbar>
+        searchCallback = {this.searchCallback}
+        homeCallback = {this.homeCallback}></Navbar>
         {this.state.articles.map((article, i) => {                
            // Return the element. Also pass key     
            return (this.renderCard(i)); 
