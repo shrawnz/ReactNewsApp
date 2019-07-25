@@ -7,6 +7,8 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 class Stack extends Component {
     constructor(props){
         super(props);
+        if(JSON.parse(localStorage.getItem('bookmarks')) == null)
+            localStorage.setItem('bookmarks',JSON.stringify({}));
         this.state = {
             articles : [],
             updateCounter: 0,
@@ -39,7 +41,6 @@ class Stack extends Component {
 
     componentDidMount() {
         this.homeCallback();
-        localStorage.setItem('bookmarks',JSON.stringify({}));
     }
 
     componentWillUnmount () {
