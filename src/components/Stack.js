@@ -12,23 +12,28 @@ class Stack extends Component {
         this.state = {
             articles : [],
             updateCounter: 0,
-            apiError: false
+            apiError: false,
+            noResultsFound: false
         }
     }
-    // componentDidUpdate(){
-    //     console.log("UPDATE HUA");
-    // }
+
+    componentDidUpdate() {
+        this.setState({noResultsFound: false})
+    }
+
     hitNewsAPI = (url) => {
         fetch(url)
         .then(res => res.json())
         .then((data) => {
             console.log(data);
-            if(data.status !== "error") {
+            if(data.status === "ok") {
+                if(data.articles.length === 0){
+                    this.setState({noResultsFound: true})
+                }
                 this.setState({
                     articles: data.articles,
                     updateCounter: this.state.updateCounter + 1
                 })
-                console.log(this.state.articles);
             } else {
                 this.setState({apiError:true, updateCounter: this.state.updateCounter + 1})
             }
@@ -78,6 +83,7 @@ class Stack extends Component {
             updateCounter: this.state.updateCounter + 1,
         })
     }
+    
     renderCard = (i) => {
         var article = this.state.articles[i];
         var content = (article.content !== null) ? article.content.substring(0, 260) : ""
@@ -93,12 +99,14 @@ class Stack extends Component {
     }
 
     renderLoader = () => {
-        if(this.state.articles.length === 0 && !this.state.apiError){
+        if(this.state.articles.length === 0 && !this.state.apiError && !this.state.noResultsFound){
         return <div class="mt-4"><div class="text-center">
                 <div class="spinner-border" role="status">
                 <span class="sr-only">Loading...</span>
                 </div></div></div>
         }
+        else if(this.state.noResultsFound)
+            return <h4 class="mt-4 ml-4">No Results Found!</h4>
         return <div></div>;
     }
 

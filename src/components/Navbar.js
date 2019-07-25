@@ -12,6 +12,7 @@ class Navbar extends Component{
         }
     }
 
+    //Handle search input change
     handleChange = (e) => {
         this.setState({searchText: e.target.value});
     }
