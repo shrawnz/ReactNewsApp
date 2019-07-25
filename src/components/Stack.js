@@ -79,6 +79,9 @@ class Stack extends Component {
     getBookmarks = () => {
         var bookmarks = JSON.parse(localStorage.getItem("bookmarks"));
         console.log(bookmarks);
+        if(Object.values(bookmarks).length === 0){
+            this.searchCallback({noResultsFound: true})
+        }
         this.setState({
             articles: Object.values(bookmarks),
             updateCounter: this.state.updateCounter + 1,
