@@ -117,7 +117,7 @@ class Stack extends Component {
 
     renderNewsStack = () => {
         return <div>{this.state.articles.map((article, i) => {                
-            // Return the element. Also pass key     
+            // render card with article data     
             return (this.renderCard(i)); 
          })}</div>
     }

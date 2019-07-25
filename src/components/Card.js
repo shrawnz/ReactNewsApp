@@ -11,6 +11,7 @@ class Card extends Component{
         }
     }
 
+    // On card data change, change value of bookmark text
     static getDerivedStateFromProps(props, state) {
         if (props.url !== state.url) {
           return {
