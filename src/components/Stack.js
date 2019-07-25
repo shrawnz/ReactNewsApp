@@ -28,6 +28,7 @@ class Stack extends Component {
             console.log(data);
             if(data.status === "ok") {
                 if(data.articles.length === 0){
+                    console.log("No results!");
                     this.setState({noResultsFound: true})
                 }
                 this.setState({
